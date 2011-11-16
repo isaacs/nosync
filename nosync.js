@@ -1,6 +1,3 @@
-var fs = require("fs")
-  , child_process = require("child_process")
-
 process.nextTick(function () {
   Object.keys(process.binding("natives")).map(function (n) {
     if (n === "sys") return []
