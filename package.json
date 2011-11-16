@@ -1,0 +1,16 @@
+{
+  "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)",
+  "name": "nosync",
+  "description": "Prevent *Sync functions from being run after the first tick",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/isaacs/nosync.git"
+  },
+  "main": "nosync.js",
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
