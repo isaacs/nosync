@@ -2,63 +2,82 @@
 /*jslint indent: 2, maxlen: 80, continue: true, unparam: true, node: true */
 'use strict';
 
-var cli = require('cli'),
-  ssap = require('./super-smartass-plugins.js');
-cli.ok('Loaded super-smartass-plugins.');
+var cli = require('cli'), ssap, tests = { info: console.log,
+  ok:     function (msg) { this.cntOk += 1; cli.ok(msg); },
+  err:    function (msg) { this.cntErr += 1; cli.error(msg); },
+  cntOk:  0,  expectOk:   10,
+  cntErr: 0,  expectErr:  0,
+  };
 
-console.log('Switching to nosync mode:');
+
+tests.ok('Loading some really smartass plugins manager:');
+ssap = require('./super-smartass-plugins.js');
+tests.ok('Loaded super-smartass-plugins.');
+
+tests.info('Switching to nosync mode:');
 require('../nosync.js');
-cli.ok('Loaded nosync.');
+tests.ok('Loaded nosync.');
 
 
-function logKeys(obj) {
+tests.logKeys = function (obj) {
   var keys = Object.keys(obj);
   keys.sort();
   keys = keys.join(', ');
   if (keys.length > 72) { keys = keys.substr(0, 70) + ' …'; }
-  console.log('  keys:  ' + keys);
-}
+  tests.info('  keys:  ' + keys);
+};
 
 
-function tryLoadSync(smartassy, assumedProp, modName) {
-  console.log('\nTrying to ' +
+tests.tryLoadModule = function (smartassy, assumedProp, modName) {
+  tests.info('\nTrying to ' +
     (smartassy ? 'smartass-load' : 'require()') + ' some probably ' +
     assumedProp + ' module "' + modName + '":');
   try {
     if (smartassy) {
-      ssap.using(modName, logKeys);
+      ssap.using(modName, tests.logKeys);
       if ('number' === typeof ssap.previouslyUsedPluginSize) {
-        cli.error('Did ssap just read some module source file sync?!');
+        tests.err('Did ssap just read some module source file sync?!');
       }
     } else {
-      logKeys(require(modName));
+      tests.logKeys(require(modName));
     }
     if (assumedProp === 'pre-loaded') {
-      cli.ok('Successfully sync-loaded "' + modName + '" from cache');
+      tests.ok('Successfully sync-loaded "' + modName + '" from cache');
     } else {
-      cli.error('Was "' + modName + '" just loaded sync?!');
+      tests.err('Was "' + modName + '" just loaded sync?!');
     }
   } catch (loadErr) {
     if (assumedProp === 'pre-loaded') {
-      cli.error('Failed to sync-loaded "' + modName + '" from cache');
+      tests.err('Failed to sync-loaded "' + modName + '" from cache');
     } else {
-      cli.ok('Failed to sync-load "' + modName + '": ' + String(loadErr));
+      tests.ok('Failed to sync-load "' + modName + '": ' + String(loadErr));
     }
   }
-}
+};
 
 
-function testsInSomeFutureTick() {
-  console.log('Timer triggered, start testing!');
-  tryLoadSync(true,   'existing',   './forever-unrequired.js');
-  tryLoadSync(true,   'existing',   'express');
-  tryLoadSync(false,  'existing',   'underscore');
-  tryLoadSync(true,   'missing',    'ai-singularity');
-  tryLoadSync(true,   'pre-loaded', '../nosync.js');
-  tryLoadSync(false,  'pre-loaded', 'cli');
-}
+tests.futureTickExperiments = function () {
+  tests.info('Timer triggered, start testing!');
+  [// smartassy assumedProp   modName
+    [ true,     'existing',   './forever-unrequired.js'],
+    [ true,     'existing',   'express'],
+    [ false,    'existing',   'underscore'],
+    [ true,     'missing',    'ai-singularity'],
+    [ true,     'pre-loaded', '../nosync.js'],
+    [ false,    'pre-loaded', 'cli'],
+  ].map(Function.apply.bind(tests.tryLoadModule, tests));
+
+  tests.info();
+  if (tests.cntOk !== tests.expectOk) {
+    throw new Error('unexpected number of successful tests: ' + tests.cntOk);
+  }
+  if (tests.cntErr !== tests.expectErr) {
+    throw new Error('unexpected number of failed tests: ' + tests.cntErr);
+  }
+  tests.info('Test statistics are as expected.');
+};
 
 
-console.log('Setting up timer for testing in some future tick:');
-setTimeout(testsInSomeFutureTick, 10);
-cli.ok('Timer set.');
+tests.info('Setting up timer for testing in some future tick:');
+setTimeout(tests.futureTickExperiments, 10);
+tests.ok('Timer set.');

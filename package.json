@@ -11,6 +11,9 @@
   "engines": {
     "node": "*"
   },
+  "scripts": {
+    "test": "nodejs test/origfuncref.js"
+  },
   "dependencies": {},
   "devDependencies": {}
 }
