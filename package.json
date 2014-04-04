@@ -1,7 +1,7 @@
 {
   "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)",
   "name": "nosync",
-  "description": "Prevent *Sync functions from being run after the first tick",
+  "description": "Prevent *Sync functions from being run after the next tick",
   "version": "1.0.0",
   "repository": {
     "type": "git",
@@ -10,6 +10,9 @@
   "main": "nosync.js",
   "engines": {
     "node": "*"
+  },
+  "scripts": {
+    "test": "nodejs test/origfuncref.js"
   },
   "dependencies": {},
   "devDependencies": {}

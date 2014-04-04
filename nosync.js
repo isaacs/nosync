@@ -15,5 +15,6 @@ process.nextTick(function () {
 })
 
 function thrower (fn) { return function () {
-  throw new Error("Sync function called after first tick: "+fn[2]+"."+fn[1])
+  throw new Error("Unexpected synchronous function call at runtime: " +
+    fn[2] + "." + fn[1])
 }}
