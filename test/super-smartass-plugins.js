@@ -7,7 +7,15 @@ var ssap = {
   loadMod:  require
 };
 
-ssap.findMod = ssap.loadMod.resolve;
+ssap.findMod = function findSmartassPlugin(pgnName) {
+  if (/^\.{1,2}\//.exec(pgnName) && /\.js$/.exec(pgnName)) {
+    /** ^-- Circumvent resolve failure for local paths in order to test
+     *      readFileSync. This way the reason for "size: null" should
+     *      change from "no file" to "failed to read". **/
+    return pgnName;
+  }
+  return ssap.loadMod.resolve(pgnName);
+};
 
 /*jslint stupid:true */
 ssap.readFile = require('fs').readFileSync;

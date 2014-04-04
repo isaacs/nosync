@@ -50,6 +50,7 @@ function tryLoadSync(smartassy, assumedProp, modName) {
 
 function testsInSomeFutureTick() {
   console.log('Timer triggered, start testing!');
+  tryLoadSync(true,   'existing',   './forever-unrequired.js');
   tryLoadSync(true,   'existing',   'express');
   tryLoadSync(false,  'existing',   'underscore');
   tryLoadSync(true,   'missing',    'ai-singularity');
