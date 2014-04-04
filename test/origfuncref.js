@@ -20,10 +20,10 @@ function logKeys(obj) {
 }
 
 
-function tryLoadSync(modName, smartassy, guessExist) {
+function tryLoadSync(smartassy, assumedProp, modName) {
   console.log('\nTrying to ' +
     (smartassy ? 'smartass-load' : 'require()') + ' some probably ' +
-    (guessExist ? 'existing' : 'missing') + ' module "' + modName + '":');
+    assumedProp + ' module "' + modName + '":');
   try {
     if (smartassy) {
       ssap.using(modName, logKeys);
@@ -33,18 +33,28 @@ function tryLoadSync(modName, smartassy, guessExist) {
     } else {
       logKeys(require(modName));
     }
-    cli.error('Was "' + modName + '" just loaded sync?!');
+    if (assumedProp === 'pre-loaded') {
+      cli.ok('Successfully sync-loaded "' + modName + '" from cache');
+    } else {
+      cli.error('Was "' + modName + '" just loaded sync?!');
+    }
   } catch (loadErr) {
-    cli.ok('Failed to sync-load "' + modName + '": ' + String(loadErr));
+    if (assumedProp === 'pre-loaded') {
+      cli.error('Failed to sync-loaded "' + modName + '" from cache');
+    } else {
+      cli.ok('Failed to sync-load "' + modName + '": ' + String(loadErr));
+    }
   }
 }
 
 
 function testsInSomeFutureTick() {
   console.log('Timer triggered, start testing!');
-  tryLoadSync('express',        true,   true);
-  tryLoadSync('underscore',     false,  true);
-  tryLoadSync('ai-singularity', true,   false);
+  tryLoadSync(true,   'existing',   'express');
+  tryLoadSync(false,  'existing',   'underscore');
+  tryLoadSync(true,   'missing',    'ai-singularity');
+  tryLoadSync(true,   'pre-loaded', '../nosync.js');
+  tryLoadSync(false,  'pre-loaded', 'cli');
 }
 
 
